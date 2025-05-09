@@ -49,7 +49,7 @@ namespace ConsultorioMedicoApp
                 adapter.Fill(dt);
                 dgvCitas.DataSource = dt;
             }
-           dgvCitas.DefaultCellStyle.ForeColor = Color.Black;
+            dgvCitas.DefaultCellStyle.ForeColor = Color.Black;
         }
 
         private void btnFiltrar_Click(object sender, EventArgs e)
@@ -59,14 +59,52 @@ namespace ConsultorioMedicoApp
 
         private void btnNuevaCita_Click(object sender, EventArgs e)
         {
-            FrmAgendarCita agendar = new FrmAgendarCita();
-            agendar.ShowDialog();
-            CargarCitas(); // Recarga al cerrar
+            FrmAgendarCita frm = new FrmAgendarCita();
+            frm.ShowDialog();
+            CargarCitas();
         }
 
         private void dgvCitas_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
 
+        }
+
+        private void btnEditarCita_Click(object sender, EventArgs e)
+        {
+            if (dgvCitas.SelectedRows.Count == 0)
+            {
+                MessageBox.Show("Seleccione una cita para editar.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            int idCita = Convert.ToInt32(dgvCitas.SelectedRows[0].Cells["id"].Value);
+
+            FrmAgendarCita frm = new FrmAgendarCita(idCita);
+            frm.ShowDialog();
+            CargarCitas(); // refresca la lista
+        }
+
+        private void btnCancelarCita_Click(object sender, EventArgs e)
+        {
+            if (dgvCitas.SelectedRows.Count == 0)
+            {
+                MessageBox.Show("Seleccione una cita para cancelar.");
+                return;
+            }
+
+            int id = Convert.ToInt32(dgvCitas.SelectedRows[0].Cells["id"].Value);
+
+            DialogResult r = MessageBox.Show("¿Está seguro de cancelar esta cita?", "Confirmar", MessageBoxButtons.YesNo);
+            if (r == DialogResult.Yes)
+            {
+                using (MySqlConnection conn = Conexion.ObtenerConexion())
+                {
+                    MySqlCommand cmd = new MySqlCommand("UPDATE cita SET estado = 'cancelada' WHERE id = @id", conn);
+                    cmd.Parameters.AddWithValue("@id", id);
+                    cmd.ExecuteNonQuery();
+                }
+                CargarCitas();
+            }
         }
     }
 }

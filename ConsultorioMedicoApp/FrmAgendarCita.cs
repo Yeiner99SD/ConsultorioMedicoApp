@@ -13,12 +13,40 @@ namespace ConsultorioMedicoApp
 {
     public partial class FrmAgendarCita : Form
     {
+        private int? citaId = null;
+
+        public FrmAgendarCita(int idCita)
+        {
+            InitializeComponent();
+            CargarPacientes();
+            this.citaId = idCita;
+            CargarMedicos();
+            CargarHoras();
+            CargarDatosCita();
+
+        }
         public FrmAgendarCita()
         {
             InitializeComponent();
             CargarPacientes();
             CargarMedicos();
-            CargarHoras();
+        }
+        private void CargarDatosCita()
+        {
+            using (MySqlConnection conn = Conexion.ObtenerConexion())
+            {
+                MySqlCommand cmd = new MySqlCommand("SELECT * FROM cita WHERE id = @id", conn);
+                cmd.Parameters.AddWithValue("@id", citaId);
+                MySqlDataReader reader = cmd.ExecuteReader();
+                if (reader.Read())
+                {
+                    cbPaciente.SelectedValue = reader["id_paciente"];
+                    cbMedico.SelectedValue = reader["id_medico"];
+                    dtpFechaCita.Value = Convert.ToDateTime(reader["fecha_cita"]);
+                    cbHora.Text = reader["hora"].ToString();
+                    txtMotivo.Text = reader["motivo"].ToString();
+                }
+            }
         }
 
         private void label4_Click(object sender, EventArgs e)
@@ -78,7 +106,8 @@ namespace ConsultorioMedicoApp
 
         private void button1_Click(object sender, EventArgs e)
         {
-            if (cbPaciente.SelectedValue == null || cbMedico.SelectedValue == null || string.IsNullOrEmpty(cbHora.Text) || string.IsNullOrEmpty(txtMotivo.Text))
+            if (cbPaciente.SelectedValue == null || cbMedico.SelectedValue == null ||
+                string.IsNullOrEmpty(cbHora.Text) || string.IsNullOrEmpty(txtMotivo.Text))
             {
                 MessageBox.Show("Todos los campos son obligatorios.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
@@ -86,7 +115,19 @@ namespace ConsultorioMedicoApp
 
             using (MySqlConnection conn = Conexion.ObtenerConexion())
             {
-                MySqlCommand cmd = new MySqlCommand("INSERT INTO cita (id_paciente, id_medico, fecha_cita, hora, motivo, estado) VALUES (@id_paciente, @id_medico, @fecha, @hora, @motivo, 'pendiente')", conn);
+                MySqlCommand cmd;
+
+                if (citaId == null)
+                {
+                    // Insertar nueva cita
+                    cmd = new MySqlCommand("INSERT INTO cita (id_paciente, id_medico, fecha_cita, hora, motivo, estado) VALUES (@id_paciente, @id_medico, @fecha, @hora, @motivo, 'pendiente')", conn);
+                }
+                else
+                {
+                    // Actualizar cita existente
+                    cmd = new MySqlCommand("UPDATE cita SET id_paciente=@id_paciente, id_medico=@id_medico, fecha_cita=@fecha, hora=@hora, motivo=@motivo WHERE id=@id", conn);
+                    cmd.Parameters.AddWithValue("@id", citaId);
+                }
 
                 cmd.Parameters.AddWithValue("@id_paciente", cbPaciente.SelectedValue);
                 cmd.Parameters.AddWithValue("@id_medico", cbMedico.SelectedValue);
@@ -95,7 +136,8 @@ namespace ConsultorioMedicoApp
                 cmd.Parameters.AddWithValue("@motivo", txtMotivo.Text);
 
                 cmd.ExecuteNonQuery();
-                MessageBox.Show("Cita registrada correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                MessageBox.Show(citaId == null ? "Cita registrada correctamente." : "Cita actualizada correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 this.Close();
             }
         }

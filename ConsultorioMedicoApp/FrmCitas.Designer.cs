@@ -32,6 +32,8 @@
             dtpFiltroFecha = new DateTimePicker();
             btnFiltrar = new Button();
             btnNuevaCita = new Button();
+            btnEditarCita = new Button();
+            btnCancelarCita = new Button();
             ((System.ComponentModel.ISupportInitialize)dgvCitas).BeginInit();
             SuspendLayout();
             // 
@@ -73,12 +75,38 @@
             btnNuevaCita.UseVisualStyleBackColor = true;
             btnNuevaCita.Click += btnNuevaCita_Click;
             // 
+            // btnEditarCita
+            // 
+            btnEditarCita.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            btnEditarCita.ForeColor = Color.Green;
+            btnEditarCita.Location = new Point(538, 76);
+            btnEditarCita.Name = "btnEditarCita";
+            btnEditarCita.Size = new Size(122, 40);
+            btnEditarCita.TabIndex = 4;
+            btnEditarCita.Text = "Editar Cita";
+            btnEditarCita.UseVisualStyleBackColor = true;
+            btnEditarCita.Click += btnEditarCita_Click;
+            // 
+            // btnCancelarCita
+            // 
+            btnCancelarCita.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            btnCancelarCita.ForeColor = Color.FromArgb(192, 0, 0);
+            btnCancelarCita.Location = new Point(666, 75);
+            btnCancelarCita.Name = "btnCancelarCita";
+            btnCancelarCita.Size = new Size(122, 40);
+            btnCancelarCita.TabIndex = 5;
+            btnCancelarCita.Text = "Cancelar Cita";
+            btnCancelarCita.UseVisualStyleBackColor = true;
+            btnCancelarCita.Click += btnCancelarCita_Click;
+            // 
             // FrmCitas
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ActiveCaption;
             ClientSize = new Size(1208, 630);
+            Controls.Add(btnCancelarCita);
+            Controls.Add(btnEditarCita);
             Controls.Add(btnNuevaCita);
             Controls.Add(btnFiltrar);
             Controls.Add(dtpFiltroFecha);
@@ -96,5 +124,7 @@
         private DateTimePicker dtpFiltroFecha;
         private Button btnFiltrar;
         private Button btnNuevaCita;
+        private Button btnEditarCita;
+        private Button btnCancelarCita;
     }
 }
